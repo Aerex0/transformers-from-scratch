@@ -1,0 +1,36 @@
+# ==========================================
+# Python & Byte-compiled / optimized files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# ==========================================
+# Environments & Dependency Managers
+# ==========================================
+# uv / venv directory
+.venv/
+env/
+venv/
+ENV/
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ==========================================
+# Project Specific (Optional but Recommended)
+# ==========================================
+# If you eventually save trained model weights locally
+*.pt
+*.pth
+*.bin
+*.pkl
