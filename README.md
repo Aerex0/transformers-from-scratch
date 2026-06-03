@@ -8,8 +8,6 @@ A hands-on implementation of the core components of the Transformer architecture
 
 ## Overview
 
-> **⚠️ Disclaimer:** This project currently only implements the architecture and forward pass of the Transformer model. No training loop, backward pass, or weight optimization has been implemented as of now. It outputs un-trained (random) predictions to demonstrate the data flow.
-
 This project provides a clean, modular, and educational implementation of the "Attention Is All You Need" architecture. By implementing the components from scratch, you can gain a deeper intuition for how self-attention, multi-head attention, masked attention, and feed-forward networks come together to form the backbone of modern Large Language Models (LLMs).
 
 ## Project Structure
