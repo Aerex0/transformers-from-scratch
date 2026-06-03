@@ -39,8 +39,8 @@ class MultiHeadAttention(nn.Module):
         
         # Linear Projections
         q_all = self.q_proj(embeddings)
-        k_all = self.k_proj(embeddings if not self.cross_attention else self.encoder_output)
-        v_all = self.v_proj(embeddings if not self.cross_attention else self.encoder_output)
+        k_all = self.k_proj(embeddings if not self.cross_attention else encoder_output)
+        v_all = self.v_proj(embeddings if not self.cross_attention else encoder_output)
 
         # Reshape and Transpose to separate heads
         # (batch_size, n_heads, seq_len, d_head)

@@ -24,18 +24,18 @@ class EncoderBlock(nn.Module):
         """
         # Multi-Head Attention
         attn_output = self.multi_head_attn(x)
-        print(f'----> Multi Head Attention output:\n {attn_output}')
-        print(f'----> Multi Head Attention output shape: {attn_output.shape}')
+        # print(f'----> Multi Head Attention output:\n {attn_output}')
+        # print(f'----> Multi Head Attention output shape: {attn_output.shape}')
         # Residual Connection + Layer Norm
         x = self.layer_norm1(attn_output + x)
-        print(f'----> Output after first residual connection and layer norm:\n {x}')
-        print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
+        # print(f'----> Output after first residual connection and layer norm:\n {x}')
+        # print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
         # Feed Forward Network
         ff_output = self.feed_forward(x)
-        print(f'----> Feed Forward output:\n {ff_output}')
-        print(f'----> Feed Forward output shape: {ff_output.shape}')
+        # print(f'----> Feed Forward output:\n {ff_output}')
+        # print(f'----> Feed Forward output shape: {ff_output.shape}')
         # Residual Connection + Layer Norm
         output = self.layer_norm2(ff_output + x)
-        print(f'----> Final output after second residual connection and layer norm:\n {output}')
-        print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
+        # print(f'----> Final output after second residual connection and layer norm:\n {output}')
+        # print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
         return output

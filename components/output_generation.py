@@ -14,10 +14,10 @@ softmax = nn.Softmax(dim=-1)
 def generate_output(decoder_output):
     # Pass through linear layer
     linear_output = layer(decoder_output)
-    print(f'----> Output after Linear Layer:\n {linear_output}')
-    print(f'----> Output after Linear Layer shape: {linear_output.shape}')
+    # print(f'----> Output after Linear Layer:\n {linear_output}')
+    # print(f'----> Output after Linear Layer shape: {linear_output.shape}')
     # Apply softmax to get probabilities
     output_probs = softmax(linear_output)
-    print(f'----> Output probabilities after Softmax:\n {output_probs}')
-    print(f'----> Output probabilities shape: {output_probs.shape}')
+    # print(f'----> Output probabilities after Softmax:\n {output_probs}')
+    # print(f'----> Output probabilities shape: {output_probs.shape}')
     return output_probs

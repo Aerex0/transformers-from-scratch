@@ -44,7 +44,7 @@ output_one_hot = F.one_hot(output_tensors, num_classes=len(tokenizer.word2id)).f
 # print(f'----> Output One-Hot Encodings:\n {output_one_hot}')
 
 
-embedding_matrix = torch.randn(len(tokenizer.word2id), D_MODEL).to(DEVICE)
+embedding_matrix = torch.randn(len(tokenizer.word2id), D_MODEL,device=DEVICE,  requires_grad=True)
 input_embeddings = torch.matmul(input_one_hot, embedding_matrix)
 output_embeddings = torch.matmul(output_one_hot, embedding_matrix)
 # print(f'----> Input Embeddings:\n {input_embeddings}')
