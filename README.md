@@ -49,18 +49,22 @@ uv sync
 
 You can tweak hyperparameters (like `D_MODEL`, `SEQ_LEN`, `BATCH_SIZE`, `N_HEADS`) directly in `config.py`.
 
-To run a forward pass of the model and see the transformation from tokenized inputs to final predicted tokens:
+To run the model and witness a full forward and backward pass (training loop):
 
 ```bash
 uv run main.py
 ```
 
 ### What happens when you run `main.py`?
-1. The script retrieves input and output embeddings for a sample text.
-2. It generates and adds 2D positional embeddings to the tokens.
-3. The inputs are passed through the `EncoderBlock`.
-4. Target (output) embeddings are prepared, augmented with positional signals, and passed through the `DecoderBlock` alongside the `encoder_output`.
-5. Finally, output probabilities are generated via the generation layer, an `argmax` yields predicted token IDs, and those IDs are decoded back to text sentences. 
+1. The script leverages a custom tokenizer to generate input and output embeddings from sample English and French sentences.
+2. It generates and adds sinusoidal positional embeddings to the tokens.
+3. The training loop starts (default 5 epochs):
+   - Computes fresh embeddings inside the loop to maintain a live PyTorch computation graph.
+   - The inputs are passed through the `EncoderBlock`.
+   - Target (output) embeddings are passed through the `DecoderBlock` alongside the context from the `encoder_output`.
+   - Output probabilities are generated via the generation layer.
+   - Computes expected cross-entropy loss against the one-hot encoded ground truth.
+   - Performs backpropagation (`loss.backward()`) and manually steps through parameters to update weights!
 
 ## References
 - [Attention Is All You Need (Vaswani et al., 2017)](https://arxiv.org/abs/1706.03762)
