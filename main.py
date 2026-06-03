@@ -4,7 +4,7 @@ from encoder.encoder import EncoderBlock
 from components.embeddings import input_embeddings, output_embeddings, input_one_hot, output_one_hot, tokenizer, encoder_sentences, output_tensors, embedding_matrix
 from decoder.decoder import DecoderBlock
 from components.positional_embeddings import get_positional_embeddings
-from components.output_generation import generate_output
+from components.output_generation import OutputGeneration
 from config import DEVICE, D_MODEL, SEQ_LEN, BATCH_SIZE, D_HEAD, LR
 
 
@@ -28,11 +28,12 @@ encoder_block = EncoderBlock().to(DEVICE)
 # print(f'----> The final decoder embeddings after adding positional embeddings are:\n {final_decoder_embds}')
 
 decoder_block = DecoderBlock().to(DEVICE)
+output_gen = OutputGeneration().to(DEVICE)
 # decoder_output = decoder_block(final_decoder_embds, encoder_output)
 # print(f'----> Decoder Block output:\n {decoder_output}')
 # print(f'----> Decoder Block output shape: {decoder_output.shape}')
 
-# output_probs = generate_output(decoder_output)
+# output_probs = output_gen(decoder_output)
 # print(f'----> Final output probabilities:\n {output_probs}')
 # print(f'----> Final output probabilities shape: {output_probs.shape}')
 
@@ -110,7 +111,7 @@ for epoch in range(1000):
     # print(f'----> Encoder Block output:\n {encoder_output}')
     # print(f'----> Encoder Block output shape: {encoder_output.shape}')
     decoder_output = decoder_block(final_decoder_embds, encoder_output)
-    output_probs = generate_output(decoder_output)
+    output_probs = output_gen(decoder_output)
     
     # Loss calculation
     loss = -output_probs[torch.arange(output_probs.size(0)).unsqueeze(1), torch.arange(output_probs.size(1)).unsqueeze(0), output_tensors].log().mean()
@@ -120,6 +121,7 @@ for epoch in range(1000):
     # Preventing gradients from previous epoch from accumulating
     encoder_block.zero_grad()
     decoder_block.zero_grad()
+    output_gen.zero_grad()
     embedding_matrix.grad = None
     
     # Backpropagation
@@ -130,6 +132,8 @@ for epoch in range(1000):
         for param in encoder_block.parameters():
             param -= LR * param.grad
         for param in decoder_block.parameters():
+            param -= LR * param.grad
+        for param in output_gen.parameters():
             param -= LR * param.grad
         embedding_matrix -= LR * embedding_matrix.grad
 
