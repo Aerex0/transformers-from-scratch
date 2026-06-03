@@ -15,7 +15,7 @@ This project provides a clean, modular, and educational implementation of the "A
 The project separates the Transformer into logical, modular components:
 
 - **`config.py`**: Central configuration (e.g., model depth, Sequence length, heads, batch size).
-- **`main.py`**: The entry point that ties everything together, running a full forward pass of the model.
+- **`main.py`**: The entry point that ties everything together, running a full forward and backward pass (training loop) of the model.
 - **`components/`**: Core building blocks of the architecture.
   - `embeddings.py`: Input/Output token embeddings.
   - `positional_embeddings.py`: Sinusoidal positional encodings to provide order context.
