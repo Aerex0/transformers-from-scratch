@@ -45,7 +45,7 @@ for epoch in range(EPOCHS):
     
     # Loss calculation
     loss = -output_probs[torch.arange(output_probs.size(0)).unsqueeze(1), torch.arange(output_probs.size(1)).unsqueeze(0), decoder_train_input_tensors].log().mean()
-    if (epoch+1) % 10 == 0:
+    if (epoch+1) % 50 == 0:
         print(f'---->Epoch {epoch+1}, Loss value: {loss.item()}')
 
     # Preventing gradients from previous epoch from accumulating

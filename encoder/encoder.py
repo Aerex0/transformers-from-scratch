@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from config import D_MODEL, N_HEADS, DEVICE, ENOCDER_LAYERS
+from config import D_MODEL, N_HEADS, DEVICE, ENCODER_LAYERS
 from components.positional_embeddings import get_positional_embeddings
 from components.multi_head_attn import MultiHeadAttention
 from components.layer_norm import LayerNorm
@@ -62,7 +62,7 @@ class EncoderBlock(nn.Module):
             print(f"\nTotal Trainable Parameters: {total_params:,}\n{'='*40}")
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, num_layers=ENOCDER_LAYERS, d_model=D_MODEL, n_heads=N_HEADS):
+    def __init__(self, num_layers=ENCODER_LAYERS, d_model=D_MODEL, n_heads=N_HEADS):
         super().__init__()
         self.layers = nn.ModuleList([
             EncoderBlock(d_model, n_heads).to(DEVICE) for _ in range(num_layers)
