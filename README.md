@@ -17,6 +17,8 @@ The project separates the Transformer into logical, modular components:
 - **`config.py`**: Central configuration (e.g., model depth, Sequence length, heads, batch size).
 - **`main.py`**: The entry point that ties everything together, running a full forward and backward pass (training loop) of the model.
 - **`components/`**: Core building blocks of the architecture.
+  - `dataset.py`: Loads the WMT 2014 English-German dataset using pandas, builds vocabulary and creates tensor inputs.
+  - `download_dataset.py`: Script leveraging `kagglehub` to download the WMT 2014 dataset.
   - `embeddings.py`: Input/Output token embeddings.
   - `positional_embeddings.py`: Sinusoidal positional encodings to provide order context.
   - `multi_head_attn.py`: Regular Multi-Head Attention (used in encoder, and cross-attention in decoder).
@@ -36,6 +38,7 @@ As detailed in `pyproject.toml`, the required dependencies are:
 - **Python** &ge; 3.14
 - **PyTorch** &ge; 2.12.0
 - **NumPy** &ge; 2.4.6
+- **Kagglehub & Pandas** (for downloading and processing the dataset)
 
 *(The model will seamlessly use CUDA/GPU if available, defaulting to CPU otherwise)*
 
@@ -56,9 +59,9 @@ uv run main.py
 ```
 
 ### What happens when you run `main.py`?
-1. The script leverages a custom tokenizer to generate input and output embeddings from sample English and French sentences.
+1. The script loads the WMT 2014 English-German dataset using pandas and leverages a custom tokenizer to build a vocabulary and generate input/output embeddings.
 2. It generates and adds sinusoidal positional embeddings to the tokens.
-3. The training loop starts (default 5 epochs):
+3. The training loop starts (default 1000 epochs):
    - Computes fresh embeddings inside the loop to maintain a live PyTorch computation graph.
    - The inputs are passed through the `EncoderBlock`.
    - Target (output) embeddings are passed through the `DecoderBlock` alongside the context from the `encoder_output`.
