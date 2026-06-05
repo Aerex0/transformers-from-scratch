@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 from config import D_MODEL, DEVICE
-from .embeddings import vocab_size
+from components.dataset import token_ids
 
 class OutputGeneration(nn.Module):
-    def __init__(self, d_model=D_MODEL, vocab_size=vocab_size):
+    def __init__(self, d_model=D_MODEL, vocab_size=len(token_ids)):
         super().__init__()
         self.linear = nn.Linear(d_model, vocab_size).to(DEVICE)
         self.softmax = nn.Softmax(dim=-1)

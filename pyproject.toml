@@ -5,7 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "kagglehub[pandas-datasets]>=1.0.1",
+    "kaggle>=2.2.0",
+    "kagglehub[pandas-datasets]<1.0.1",
     "numpy>=2.4.6",
     "torch>=2.12.0",
 ]
