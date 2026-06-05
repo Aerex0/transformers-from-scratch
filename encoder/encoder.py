@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from config import D_MODEL, N_HEADS, DEVICE, SEQ_LEN, BATCH_SIZE, D_HEAD
+from config import D_MODEL, N_HEADS, DEVICE, ENOCDER_LAYERS
 from components.positional_embeddings import get_positional_embeddings
 from components.multi_head_attn import MultiHeadAttention
 from components.layer_norm import LayerNorm
@@ -39,3 +39,60 @@ class EncoderBlock(nn.Module):
         # print(f'----> Final output after second residual connection and layer norm:\n {output}')
         # print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
         return output
+
+    def print_parameters(self, print_values=False):
+            """
+            Prints the layer names, shapes, and optionally the actual tensor values.
+            """
+            print(f"\n{'='*40}\n MODEL PARAMETERS OVERVIEW \n{'='*40}")
+            total_params = 0
+            
+            for name, param in self.named_parameters():
+                print(f"Layer: {name}")
+                print(f" -> Shape: {list(param.shape)}")
+                print(f" -> Requires Grad: {param.requires_grad}")
+                
+                if print_values:
+                    print(f" -> Values:\n{param.data}\n")
+                
+                # Calculate total elements in this specific parameter tensor
+                total_params += param.numel()
+                print("-" * 40)
+                
+            print(f"\nTotal Trainable Parameters: {total_params:,}\n{'='*40}")
+
+class TransformerEncoder(nn.Module):
+    def __init__(self, num_layers=ENOCDER_LAYERS, d_model=D_MODEL, n_heads=N_HEADS):
+        super().__init__()
+        self.layers = nn.ModuleList([
+            EncoderBlock(d_model, n_heads).to(DEVICE) for _ in range(num_layers)
+            ])
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+
+    def print_parameters(self, Layer_values=False, print_values=False):
+        """
+        Prints the layer names, shapes, and optionally the actual tensor values.
+        """
+        print(f"\n{'='*40}\n ENCODER PARAMETERS OVERVIEW ")
+        total_params = 0
+        
+        for name, param in self.named_parameters():
+            if Layer_values:
+                print(f"Layer: {name}")
+                print(f" -> Shape: {list(param.shape)}")
+                print(f" -> Requires Grad: {param.requires_grad}")
+            
+            if print_values:
+                print(f" -> Values:\n{param.data}\n")
+            
+            # Calculate total elements in this specific parameter tensor
+            total_params += param.numel()
+        print(f'Encoder Parameters: {total_params}')
+        print("=" * 40)
+            
+        # print(f"\nTotal Trainable Parameters: {total_params:,}\n{'='*40}")
+        return total_params

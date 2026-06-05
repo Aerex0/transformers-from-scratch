@@ -5,8 +5,8 @@ import pandas as pd
 from components.tokenizer import WordTokenizer
 from components.dataset import encoder_train_input_tensors, decoder_train_input_tensors, tokenizer, token_ids, id_tokens, train_df, val_df, test_df
 from components.embeddings import input_embeddings, output_embeddings, input_one_hot, output_one_hot, embedding_matrix
-from encoder.encoder import EncoderBlock
-from decoder.decoder import DecoderBlock
+from encoder.encoder import EncoderBlock, TransformerEncoder
+from decoder.decoder import DecoderBlock, TransformerDecoder
 from components.positional_embeddings import get_positional_embeddings
 from components.output_generation import OutputGeneration
 from config import DEVICE, D_MODEL, SEQ_LEN, BATCH_SIZE, D_HEAD, LR, EPOCHS
@@ -17,15 +17,15 @@ print(f'----> Sample from Train set:\n {train_df.sample(5)}')
 # Initialize components
 
 position = get_positional_embeddings(SEQ_LEN, DEVICE, D_MODEL)
-encoder_block = EncoderBlock().to(DEVICE)
-decoder_block = DecoderBlock().to(DEVICE)
+encoder_block = TransformerEncoder().to(DEVICE)
+decoder_block = TransformerDecoder().to(DEVICE)
 output_gen = OutputGeneration().to(DEVICE)
 
 print("-" * 100)
 print("Components Initialized Successfully. Starting Training Loop...")
 
 start_time = time.time()
-# Training Starts From here ----------------------------------------------------------------------------------------------------------------------------------
+# Training Starts From here --------------------------------------------------
 for epoch in range(EPOCHS):
 
     # Recompute embeddings inside the loop to build a new computation graph
@@ -68,3 +68,12 @@ for epoch in range(EPOCHS):
         embedding_matrix -= LR * embedding_matrix.grad
 end_time = time.time()
 print(f'Training completed in {(end_time - start_time)/60:.2f} minutes.')
+
+
+# Parameters Overview
+print("\n" + "="*40 + "\n TRANSFORMER PARAMETERS SUMMARY \n" + "="*40)
+encoder_params = encoder_block.print_parameters(Layer_values=False, print_values=False)
+decoder_params = decoder_block.print_parameters(Layer_values=False, print_values=False)
+output_params = output_gen.print_parameters(Layer_values=False, print_values=False)
+total_params = encoder_params + decoder_params + output_params
+print(f"\nTotal Trainable Parameters in the Transformer Model: {total_params:,}\n")
