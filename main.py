@@ -3,16 +3,20 @@ import torch
 import torch.nn.functional as F
 import pandas as pd
 from components.tokenizer import WordTokenizer
-from components.dataset import encoder_train_input_tensors, decoder_train_input_tensors, tokenizer, token_ids, id_tokens, train_df, val_df, test_df
-from components.embeddings import input_embeddings, output_embeddings, input_one_hot, output_one_hot, embedding_matrix
+from components.dataset import encoder_train_input_tensors, decoder_train_input_tensors, encoder_val_input_tensors, decoder_val_input_tensors, encoder_test_input_tensors, decoder_test_input_tensors, tokenizer, token_ids, id_tokens, train_df, val_df, test_df
+from components.embeddings import embedding_matrix
 from encoder.encoder import EncoderBlock, TransformerEncoder
 from decoder.decoder import DecoderBlock, TransformerDecoder
 from components.positional_embeddings import get_positional_embeddings
 from components.output_generation import OutputGeneration
-from config import DEVICE, D_MODEL, SEQ_LEN, BATCH_SIZE, D_HEAD, LR, EPOCHS
+from config import DEVICE, D_MODEL, SEQ_LEN, BATCH_SIZE, D_HEAD, LR, EPOCHS, ENCODER_LAYERS, DECODER_LAYERS, N_HEADS
 
 print(f'Train set size: {len(train_df)}, Validation set size: {len(val_df)}, Test set size: {len(test_df)}')
-print(f'----> Sample from Train set:\n {train_df.sample(5)}')
+print(f'Device being used for training: {DEVICE}')
+print(f'Dimension of Model (D_MODEL): {D_MODEL}, Sequence Length (SEQ_LEN): {SEQ_LEN}, Batch Size: {BATCH_SIZE}')
+print(f'Number of Encoder Layers: {ENCODER_LAYERS}, Number of Decoder Layers: {DECODER_LAYERS}, Number of Attention Heads: {N_HEADS}')
+print(f'Learning Rate: {LR}, Number of Epochs: {EPOCHS}')
+print(f'----> Sample from Train set:\n {train_df.sample(5 if len(train_df) >= 5 else len(train_df))}')
 
 # Initialize components
 
@@ -29,11 +33,17 @@ start_time = time.time()
 for epoch in range(EPOCHS):
 
     # Recompute embeddings inside the loop to build a new computation graph
-    input_embeddings = torch.matmul(input_one_hot, embedding_matrix)
-    output_embeddings = torch.matmul(output_one_hot, embedding_matrix)
+    encoder_input_embeddings = embedding_matrix(encoder_train_input_tensors)
+    print(f'----> Encoder input embeddings shape: {encoder_input_embeddings.shape}')
+    print(f'----> Encoder input embeddings sample:\n {encoder_input_embeddings}')
+    decoder_output_embeddings = embedding_matrix(decoder_train_input_tensors)
+    # input_embeddings = torch.matmul(input_one_hot, embedding_matrix)
+    # output_embeddings = torch.matmul(output_one_hot, embedding_matrix)
 
-    final_encoder_embds = input_embeddings + position
-    final_decoder_embds = output_embeddings + position
+    final_encoder_embds = encoder_input_embeddings + position
+    print(f'----> Final encoder embeddings after adding positional encodings shape: {final_encoder_embds.shape}')
+    print(f'----> Final encoder embeddings after adding positional encodings sample:\n {final_encoder_embds}')
+    final_decoder_embds = decoder_output_embeddings + position
 
     # Forward pass
     encoder_output = encoder_block(final_encoder_embds)
@@ -48,11 +58,13 @@ for epoch in range(EPOCHS):
     if (epoch+1) % 50 == 0:
         print(f'---->Epoch {epoch+1}, Loss value: {loss.item()}')
 
+    print(f'---->Epoch {epoch+1}, Loss value: {loss.item()}')
+
     # Preventing gradients from previous epoch from accumulating
     encoder_block.zero_grad()
     decoder_block.zero_grad()
     output_gen.zero_grad()
-    embedding_matrix.grad = None
+    # embedding_matrix.weight.grad = None
     
     # Backpropagation
     loss.backward()
@@ -65,15 +77,17 @@ for epoch in range(EPOCHS):
             param -= LR * param.grad
         for param in output_gen.parameters():
             param -= LR * param.grad
-        embedding_matrix -= LR * embedding_matrix.grad
+        # embedding_matrix -= LR * embedding_matrix.weight.grad Since the weights of the linear layer in output generation are shared with the embedding matrix, we don't need to update them separately here. They will be updated through the gradients computed for the output generation linear layer.
+    break
 end_time = time.time()
 print(f'Training completed in {(end_time - start_time)/60:.2f} minutes.')
 
-
+'''
 # Parameters Overview
 print("\n" + "="*40 + "\n TRANSFORMER PARAMETERS SUMMARY \n" + "="*40)
 encoder_params = encoder_block.print_parameters(Layer_values=False, print_values=False)
 decoder_params = decoder_block.print_parameters(Layer_values=False, print_values=False)
 output_params = output_gen.print_parameters(Layer_values=False, print_values=False)
+
 total_params = encoder_params + decoder_params + output_params
-print(f"\nTotal Trainable Parameters in the Transformer Model: {total_params:,}\n")
+print(f"\nTotal Trainable Parameters in the Transformer Model: {total_params:,}\n")'''
