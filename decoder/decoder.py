@@ -18,6 +18,12 @@ class DecoderBlock(nn.Module):
         self.feed_forward = FeedForward(d_model).to(DEVICE)
         self.layer_norm3 = LayerNorm(d_model).to(DEVICE)
 
+        # Dropout layers for regularization
+        self.masked_multi_head_attn_dropout = nn.Dropout(0.1).to(DEVICE)
+        self.cross_attn_dropout = nn.Dropout(0.1).to(DEVICE)
+        self.ff_dropout = nn.Dropout(0.1).to(DEVICE)
+
+
     def forward(self, x, encoder_output):
         """
         Steps in the forward pass of the Decoder Block:
@@ -32,7 +38,7 @@ class DecoderBlock(nn.Module):
         masked_attn_output = self.masked_multi_head_attn(x)
         # print(f'----> Masked Multi Head Attention output:\n {masked_attn_output}')
         # print(f'----> Masked Multi Head Attention output shape: {masked_attn_output.shape}')
-        x = self.layer_norm1(masked_attn_output + x)  # Residual Connection + Layer Norm
+        x = self.layer_norm1(self.masked_multi_head_attn_dropout(masked_attn_output) + x)  # Residual Connection + Layer Norm
         # print(f'----> Output after first residual connection and layer norm:\n {x}')
         # print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
         
@@ -40,7 +46,7 @@ class DecoderBlock(nn.Module):
         attn_output = self.multi_head_attn(x, encoder_output)
         # print(f'----> Multi Head Attention output:\n {attn_output}')
         # print(f'----> Multi Head Attention output shape: {attn_output.shape}')
-        x = self.layer_norm2(attn_output + x)  # Residual Connection + Layer Norm
+        x = self.layer_norm2(self.cross_attn_dropout(attn_output) + x)  # Residual Connection + Layer Norm
         # print(f'----> Output after second residual connection and layer norm:\n {x}')
         # print(f'----> Output after second residual connection and layer norm shape: {x.shape}')
         
@@ -48,7 +54,7 @@ class DecoderBlock(nn.Module):
         ff_output = self.feed_forward(x)
         # print(f'----> Feed Forward output:\n {ff_output}')
         # print(f'----> Feed Forward output shape: {ff_output.shape}')
-        output = self.layer_norm3(ff_output + x)  # Residual Connection + Layer Norm
+        output = self.layer_norm3(self.ff_dropout(ff_output) + x)  # Residual Connection + Layer Norm
         # print(f'----> Output after third residual connection and layer norm:\n {output}')
         # print(f'----> Output after third residual connection and layer norm shape: {output.shape}')
         

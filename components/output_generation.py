@@ -5,10 +5,13 @@ from components.dataset import token_ids
 from components.embeddings import embedding_matrix
 
 class OutputGeneration(nn.Module):
-    def __init__(self, d_model=D_MODEL, vocab_size=len(token_ids)):
+    def __init__(self, d_model=D_MODEL, vocab_size=len(token_ids), shared_weight=None):
         super().__init__()
-        self.linear = nn.Linear(d_model, vocab_size).to(DEVICE)
-        self.linear.weight = embedding_matrix.weight  # Sharing weights with the embedding matrix
+        self.linear = nn.Linear(d_model, vocab_size, bias=False).to(DEVICE)
+        if shared_weight is not None:
+            # Tie the weights directly to the embedding weights
+            self.linear.weight = shared_weight
+        # self.linear.weight = embedding_matrix.weight  # Sharing weights with the embedding matrix
         self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, decoder_output):

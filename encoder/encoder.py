@@ -14,6 +14,10 @@ class EncoderBlock(nn.Module):
         self.feed_forward = FeedForward(d_model).to(DEVICE)
         self.layer_norm2 = LayerNorm(d_model).to(DEVICE)
 
+        # Dropout layers for regularization
+        self.attn_dropout = nn.Dropout(0.1).to(DEVICE)
+        self.ff_dropout = nn.Dropout(0.1).to(DEVICE)
+
     def forward(self, x):
         """
         Steps in the forward pass of the Encoder Block:
@@ -27,7 +31,7 @@ class EncoderBlock(nn.Module):
         # print(f'----> Multi Head Attention output:\n {attn_output}')
         # print(f'----> Multi Head Attention output shape: {attn_output.shape}')
         # Residual Connection + Layer Norm
-        x = self.layer_norm1(attn_output + x)
+        x = self.layer_norm1(self.attn_dropout(attn_output) + x)
         # print(f'----> Output after first residual connection and layer norm:\n {x}')
         # print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
         # Feed Forward Network
@@ -35,7 +39,7 @@ class EncoderBlock(nn.Module):
         # print(f'----> Feed Forward output:\n {ff_output}')
         # print(f'----> Feed Forward output shape: {ff_output.shape}')
         # Residual Connection + Layer Norm
-        output = self.layer_norm2(ff_output + x)
+        output = self.layer_norm2(self.ff_dropout(ff_output) + x)
         # print(f'----> Final output after second residual connection and layer norm:\n {output}')
         # print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
         return output

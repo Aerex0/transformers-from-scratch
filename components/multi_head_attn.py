@@ -20,6 +20,8 @@ class MultiHeadAttention(nn.Module):
         # 2. Output projection layer to mix head contexts back together
         self.out_proj = nn.Linear(d_model, d_model)
 
+        self.dropout = nn.Dropout(0.1)  # Adding dropout for regularization
+
     def self_attention(self, Q, K, V):
         # Q, K, V shapes: (batch_size, n_heads, seq_len, d_head)
         # We grab d_k from the last dimension dynamically
@@ -30,6 +32,9 @@ class MultiHeadAttention(nn.Module):
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
             
         attention_weights = torch.softmax(scores, dim=-1)
+
+        # Apply dropout to attention weights
+        attention_weights = self.dropout(attention_weights)
         
         # Multiply weights with V: (seq_len, seq_len) @ (seq_len, d_head)
         return torch.matmul(attention_weights, V)
