@@ -147,7 +147,7 @@ for epoch in range(TOTAL_STEPS):
         )
         print(f"🔥 New best validation loss: {best_val_loss:.6f}. Checkpoint saved!")
 
-    if (epoch+1) % 1 == 0:
+    if (epoch+1) % 50 == 0:
         print(
             f"Epoch {epoch+1:4d} | "
             f"LR: {LR:.4e} | "

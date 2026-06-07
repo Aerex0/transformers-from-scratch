@@ -9,14 +9,13 @@ from components.preprocess import filter_invalid_sentences
 train_df = pd.read_csv(
     path + "/wmt14_translate_de-en_train.csv",
     engine='python',
-    nrows=100,
+    nrows=100000,
     on_bad_lines='skip'
 )
 
 val_df = pd.read_csv(
     path + "/wmt14_translate_de-en_validation.csv",
     engine='python',
-    nrows=20,
     on_bad_lines='skip'
 )
 
