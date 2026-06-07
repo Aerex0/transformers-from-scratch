@@ -18,4 +18,4 @@ plt.legend(fontsize=12)
 
 
 plt.savefig("loss_curves.png", dpi=300)
-plt.show()
+# plt.show()

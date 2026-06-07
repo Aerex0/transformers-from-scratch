@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 from config import D_MODEL, DEVICE
 from components.dataset import token_ids
-from components.embeddings import embedding_matrix
+# from components.embeddings import embedding_matrix
+
+debug = False
 
 class OutputGeneration(nn.Module):
     def __init__(self, d_model=D_MODEL, vocab_size=len(token_ids), shared_weight=None):
@@ -11,26 +13,21 @@ class OutputGeneration(nn.Module):
         if shared_weight is not None:
             # Tie the weights directly to the embedding weights
             self.linear.weight = shared_weight
-        # self.linear.weight = embedding_matrix.weight  # Sharing weights with the embedding matrix
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, decoder_output):
         # Pass through linear layer
-        linear_output = self.linear(decoder_output)
-        # print(f'----> Output after Linear Layer:\n {linear_output}')
-        # print(f'----> Output after Linear Layer shape: {linear_output.shape}')
-        # Apply softmax to get probabilities
-        output_probs = self.softmax(linear_output)
-        # print(f'----> Output probabilities after Softmax:\n {output_probs}')
-        # print(f'----> Output probabilities shape: {output_probs.shape}')
-        return output_probs
+        logits = self.linear(decoder_output)
+        if debug:
+            print(f'----> Output after Linear Layer:\n {logits}')
+            print(f'----> Output after Linear Layer shape: {logits.shape}')
+        return logits
 
     def print_parameters(self, Layer_values=False, print_values=False):
         """
         Prints the layer names, shapes, and optionally the actual tensor values.
         """
         print(f"\n{'='*40}\n OUTPUT GENERATION PARAMETERS OVERVIEW")
-        print(f'Address of linear layer weights: {id(self.linear.weight)}, Address of embedding matrix weights: {id(embedding_matrix.weight)}')
+        # print(f'Address of linear layer weights: {id(self.linear.weight)}, Address of embedding matrix weights: {id(embedding_matrix.weight)}')
         total_params = 0
         
         for name, param in self.named_parameters():

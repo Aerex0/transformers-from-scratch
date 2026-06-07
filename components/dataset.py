@@ -39,12 +39,15 @@ id_tokens = tokenizer.id2word
 train_en_list = train_df['en'].values
 train_de_list = train_df['de'].values
 
-encoder_train_input_tokens = [tokenizer.encode(sentence, add_sos=True, add_eos=True, max_len=MAX_LEN) for sentence in train_en_list]
+encoder_train_input_tokens = [tokenizer.encode(sentence, add_sos=False, add_eos=True, max_len=MAX_LEN) for sentence in train_en_list]
 encoder_train_input_tensors = torch.tensor(encoder_train_input_tokens).to(DEVICE)
 # print(f' Encoder train input tensors: {encoder_train_input_tensors}')
 
 decoder_train_input_tokens = [tokenizer.encode(sentence, add_sos=True, add_eos=True, max_len=MAX_LEN) for sentence in train_de_list]
 decoder_train_input_tensors = torch.tensor(decoder_train_input_tokens).to(DEVICE)
+
+target_train_input_tokens = [tokenizer.encode(sentence, add_sos=False, add_eos=True, max_len=MAX_LEN) for sentence in train_de_list]
+target_train_input_tensors = torch.tensor(target_train_input_tokens).to(DEVICE)
 
 
 # Validation
@@ -57,6 +60,9 @@ encoder_val_input_tensors = torch.tensor(enocder_val_input_tokens).to(DEVICE)
 decoder_val_input_tokens = [tokenizer.encode(sentence, add_sos=True, add_eos=True, max_len=MAX_LEN) for sentence in val_de_list]
 decoder_val_input_tensors = torch.tensor(decoder_val_input_tokens).to(DEVICE)
 
+target_val_input_tokens = [tokenizer.encode(sentence, add_sos=False, add_eos=True, max_len=MAX_LEN) for sentence in val_de_list]
+target_val_input_tensors = torch.tensor(target_val_input_tokens).to(DEVICE)
+
 # Test
 
 test_en_list = test_df['en'].values
@@ -67,3 +73,6 @@ encoder_test_input_tensors = torch.tensor(encoder_test_input_tokens).to(DEVICE)
 
 decoder_test_input_tokens = [tokenizer.encode(sentence, add_sos=True, add_eos=True, max_len=MAX_LEN) for sentence in test_de_list]
 decoder_test_input_tensors = torch.tensor(decoder_test_input_tokens).to(DEVICE)
+
+target_test_input_tokens = [tokenizer.encode(sentence, add_sos=False, add_eos=True, max_len=MAX_LEN) for sentence in test_de_list]
+target_test_input_tensors = torch.tensor(target_test_input_tokens).to(DEVICE)

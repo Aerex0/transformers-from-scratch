@@ -40,3 +40,5 @@ ENV/
 logs/
 tmp/
 transformer_training_history.csv
+lightning_instruct.txt
+loss_curves.png

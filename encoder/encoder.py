@@ -6,6 +6,8 @@ from components.multi_head_attn import MultiHeadAttention
 from components.layer_norm import LayerNorm
 from components.feed_forward import FeedForward
 
+debug = False
+
 class EncoderBlock(nn.Module):
     def __init__(self, d_model=D_MODEL, n_heads=N_HEADS):
         super().__init__()
@@ -28,20 +30,24 @@ class EncoderBlock(nn.Module):
         """
         # Multi-Head Attention
         attn_output = self.multi_head_attn(x)
-        # print(f'----> Multi Head Attention output:\n {attn_output}')
-        # print(f'----> Multi Head Attention output shape: {attn_output.shape}')
+        if debug:
+            print(f'----> Multi Head Attention output:\n {attn_output}')
+            print(f'----> Multi Head Attention output shape: {attn_output.shape}')
         # Residual Connection + Layer Norm
         x = self.layer_norm1(self.attn_dropout(attn_output) + x)
-        # print(f'----> Output after first residual connection and layer norm:\n {x}')
-        # print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
+        if debug:
+            print(f'----> Output after first residual connection and layer norm:\n {x}')
+            print(f'----> Output after first residual connection and layer norm shape: {x.shape}')
         # Feed Forward Network
         ff_output = self.feed_forward(x)
-        # print(f'----> Feed Forward output:\n {ff_output}')
-        # print(f'----> Feed Forward output shape: {ff_output.shape}')
+        if debug:
+            print(f'----> Feed Forward output:\n {ff_output}')
+            print(f'----> Feed Forward output shape: {ff_output.shape}')
         # Residual Connection + Layer Norm
         output = self.layer_norm2(self.ff_dropout(ff_output) + x)
-        # print(f'----> Final output after second residual connection and layer norm:\n {output}')
-        # print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
+        if debug:
+            print(f'----> Final output after second residual connection and layer norm:\n {output}')
+            print(f'----> Final output after second residual connection and layer norm shape: {output.shape}')
         return output
 
     def print_parameters(self, print_values=False):
