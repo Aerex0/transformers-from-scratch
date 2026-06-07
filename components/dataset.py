@@ -3,6 +3,7 @@ import torch
 from components.tokenizer import WordTokenizer
 from components.download_dataset import path
 from config import DEVICE, MAX_LEN
+from components.preprocess import filter_invalid_sentences
 
 # Load the dataset into pandas DataFrames
 train_df = pd.read_csv(
@@ -24,6 +25,10 @@ test_df = pd.read_csv(
     engine='python',
     on_bad_lines='skip'
 )
+
+train_df = filter_invalid_sentences(train_df, src_col='de', trg_col='en', min_words=10)
+val_df   = filter_invalid_sentences(val_df,   src_col='de', trg_col='en', min_words=10)
+test_df  = filter_invalid_sentences(test_df,  src_col='de', trg_col='en', min_words=10)
 
 tokenizer = WordTokenizer()
 tokenizer.build_vocab(train_df['en'] + ' ' + train_df['de'])

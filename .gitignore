@@ -39,3 +39,4 @@ ENV/
 # Logs and temporary files
 logs/
 tmp/
+transformer_training_history.csv
