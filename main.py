@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import pandas as pd
+from components.save_checkpoint import save_checkpoint
 from components.tokenizer import WordTokenizer
 from components.dataset import (
     tokenizer, token_ids, id_tokens,
@@ -57,6 +58,8 @@ history = {
     'train_loss': [],
     'val_loss': []
 }
+
+best_val_loss = float('inf')  # Initialize best validation loss for checkpointing
 
 start_time = time.time()
 # Training Starts From here --------------------------------------------------
@@ -130,8 +133,21 @@ for epoch in range(TOTAL_STEPS):
     avg_val_loss = total_val_loss / len(encoder_val_batch)
     history['val_loss'].append(avg_val_loss)
     
+    if avg_val_loss < best_val_loss:
+        best_val_loss = avg_val_loss
+        save_checkpoint(
+            epoch=epoch + 1,
+            encoder=encoder_block,
+            decoder=decoder_block,
+            embeddings=embedding_layer,
+            output_gen=output_gen,
+            optimizer=optimizer,
+            history=history,
+            filename="transformer_best_model.pt" # Always overwrites this file with the best version
+        )
+        print(f"🔥 New best validation loss: {best_val_loss:.6f}. Checkpoint saved!")
 
-    if (epoch+1) % 50 == 0:
+    if (epoch+1) % 1 == 0:
         print(
             f"Epoch {epoch+1:4d} | "
             f"LR: {LR:.4e} | "
